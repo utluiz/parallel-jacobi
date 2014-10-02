@@ -5,16 +5,22 @@
 
 void write_results(timer* t, char* inputfile, int thread_count, int algorithm, int size) {
 	//clock time
+
+#ifdef __linux__ || _unix_ || _unix
     struct timespec spec;
     clock_gettime(CLOCK_REALTIME, &spec);
     long timestamp = floor(spec.tv_sec * 1.0e8 + spec.tv_nsec / 100.0);
+# else
+    long timestamp = 0;
+#endif
 
     //date and time as string
 	time_t rawtime;
 	time(&rawtime);
-	struct tm * timeinfo = localtime (&rawtime);
+	struct tm *timeinfo = localtime(&rawtime);
 	char datetime[80];
-	strftime(datetime, 80, "%F %T", timeinfo);
+	//strftime(&datetime, 80, "%F %T", timeinfo);
+	strftime(&datetime, 80, "%Y-%m-%d %H:%M:%S", timeinfo);
 
 	//filename
 	char filename[80];

@@ -20,11 +20,11 @@ jacobi_result* jacobi_serial(matrix *m) {
 	}
 
 	//main loop
-	while (k < 1000) {
+	while (k < 100) {
 
 		//sum up items
-		soma = 0;
 		for (i = 0; i < m->size; i++) {
+			soma = 0;
 			for (j = 0; j < m->size; j++) {
 				if (j != i) {
 					soma += m->a[i][j] * x0[j];
@@ -37,15 +37,15 @@ jacobi_result* jacobi_serial(matrix *m) {
 		n1 = 0;
 		n2 = 0;
 		for (i = 0; i < m->size; i++) {
+			//printf("%f.6, ", x[i]);
 			x2[i] = x[i] - x0[i];
 			n1 += x2[i] * x2[i];
 			n2 += x[i] * x[i];
 		}
 		norma = sqrt(n1 / n2);
-		printf("norma = %f, norma_ant = %f, n1 = %f, n2 = %f \n",
-				norma, norma_ant, n1, n2);
+		//printf("\nnorma = %.6f, norma_ant = %.6f, n1 = %.6f, n2 = %.6f \n", norma, norma_ant, n1, n2);
 
-		if (k > 1 && norma <= precision) {
+		if (k > 1 && (norma <= precision)) {
 			break;
 		} else {
 			norma_ant = norma;

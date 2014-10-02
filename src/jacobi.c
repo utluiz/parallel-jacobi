@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+//#include <unistd.h>
+#include <windows.h>
 #include "matrix.h"
 #include "timer.h"
 #include "results.h"
@@ -54,6 +56,7 @@ int main(int argc, char *argv[]) {
 
 	switch (algorithm) {
 		case 1: // pthread parallel
+			result = jacobi_parallel_pthread(m, thread_count);
 			break;
 		case 2: // MPI parallel
 			break;
@@ -63,15 +66,17 @@ int main(int argc, char *argv[]) {
 		default:
 			result = jacobi_serial(m);
 	}
-
+	Sleep(500);
 	//stops timer
 	stop_timer_print(t);
 
 	//prints result
 	int i;
+	printf("\nResults: ");
 	for (i = 0; i < m->size; i++) {
 		printf("%f, ", result->x[i]);
 	}
+	printf("\nIterations: %i ", result->k);
 
 	//saves results
 	write_results(t, argv[1], thread_count, algorithm, m->size);
