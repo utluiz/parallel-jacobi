@@ -32,6 +32,8 @@ matrix* matrix_load(char* filename) {
 		m->a[i] = malloc(size*sizeof(double));
 	}
 
+	char c[10];
+
 	//read rows
 	for(i = 0; i < size; i++) {
 		//read cols
@@ -40,6 +42,8 @@ matrix* matrix_load(char* filename) {
 				break;
 			}
 		}
+		fscanf(file, "%s", &c);
+
 		if (!fscanf(file, "%lf", &m->b[i])) {
 			break;
 		}

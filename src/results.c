@@ -3,7 +3,7 @@
 #include <math.h>
 #include "results.h"
 
-void write_results(timer* t, char* inputfile, int thread_count, int size) {
+void write_results(timer* t, char* inputfile, int thread_count, int algorithm, int size) {
 	//clock time
     struct timespec spec;
     clock_gettime(CLOCK_REALTIME, &spec);
@@ -16,8 +16,12 @@ void write_results(timer* t, char* inputfile, int thread_count, int size) {
 	char datetime[80];
 	strftime(datetime, 80, "%F %T", timeinfo);
 
+	//filename
+	char filename[80];
+	sprintf(&filename, "results-%i.txt", algorithm);
+
    	//write to file
-   	FILE* f = fopen("results.txt", "a");
+   	FILE* f = fopen(filename, "a");
 	fprintf(f, "%s\t%s\t%li\t%i\t%i\t%.9f\t%.9f\t%i\t%.9f\t\n",
 			inputfile,
 			datetime,
