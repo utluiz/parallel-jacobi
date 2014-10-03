@@ -3,15 +3,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <pthread.h>
-#include <windows.h>
+//#include <windows.h>
 #include "matrix.h"
 #include "jacobi.h"
 
-
 typedef struct {
 	matrix *m;
-	double *x0, *x;
-	int number, lines_to_process;
+	double *x0, *x, *x2;
+	int number, initial_line, end_line;
 } thread_argument_pthread;
 
 void *jacobi_pthread_task(void *argument)
@@ -19,17 +18,22 @@ void *jacobi_pthread_task(void *argument)
 	thread_argument_pthread *thread_arg = (thread_argument_pthread *) argument;
 
 	matrix *m = thread_arg->m;
-	double *x0 = thread_arg->x0, *x = thread_arg->x;
-	int j, soma = 0, i = thread_arg->number;
-	for (j = 0; j < m->size; j++) {
-		//printf("Hello from thread %i\n", thread_arg->number);
-		if (j != i) {
-			soma += m->a[i][j] * x0[j];
-		}
-		//Sleep(100);
-	}
-	x[i] = (m->b[i] - soma) / m->a[i][i];
+	double *x0 = thread_arg->x0, *x = thread_arg->x, *x2 = thread_arg->x2;
+	int i, j;
+	double soma;
 
+	for (i = thread_arg->initial_line; i <= thread_arg->end_line; i++) {
+		soma = 0;
+		for (j = 0; j < m->size; j++) {
+			//printf("Hello from thread %i\n", thread_arg->number);
+			if (j != i) {
+				soma += m->a[i][j] * x0[j];
+			}
+			//Sleep(100);
+		}
+		x[i] = (m->b[i] - soma) / m->a[i][i];
+		x2[i] = x[i] - x0[i];
+	}
    return NULL;
 }
 
@@ -38,7 +42,7 @@ jacobi_result* jacobi_parallel_pthread(matrix *m, int thread_count) {
 	pthread_t *threads = malloc(m->size * sizeof(pthread_t));
 	thread_argument_pthread *thread_args = malloc(m->size * sizeof(thread_argument_pthread));
 
-	int i, k = 0;
+	int t, i, k = 0;
 	double norma, norma_ant = 0, n1, n2;
 
 	//initialize temp arrays
@@ -51,40 +55,60 @@ jacobi_result* jacobi_parallel_pthread(matrix *m, int thread_count) {
 		x0[i] = 1;
 	}
 
+	if (thread_count > m->size) {
+		thread_count = m->size;
+	}
+	/*
+	 * Example:
+	 * T  S  R
+	 * 4  4  0  1 1 1 1
+	 * 4  3  3  1 1 1 0
+	 * 4  5  1  2 1 1 1
+	 * 4  6  2  2 2 1 1
+	 */
+	int resto = m->size % thread_count;
+	int qtd = ceil((double) m->size / thread_count);
+	int initial = 0;
+	for (t = 0; t < thread_count; t++) {
+		thread_args[t].initial_line = initial;
+		thread_args[t].end_line = initial + qtd  -1;
+		//printf("%i, %i\n", thread_args[t].initial_line, thread_args[t].end_line);
+		thread_args[t].number = t;
+		thread_args[t].m = m;
+		thread_args[t].x = x;
+		thread_args[t].x0 = x0;
+		thread_args[t].x2 = x2;
+		initial += qtd;
+		if (t == resto - 1) qtd--;
+	}
+
 	//main loop
 	while (k < 100) {
 
-		//TODO fork by thread_count
 		//sum up items
-		for (i = 0; i < m->size; i++) {
-			thread_args[i].lines_to_process = 1;
-			thread_args[i].number = i;
-			thread_args[i].m = m;
-			thread_args[i].x = x;
-			thread_args[i].x0 = x0;
+		for (t = 0; t < thread_count; t++) {
 			pthread_create(
-					&threads[i],
+					&threads[t],
 					NULL,
 					jacobi_pthread_task,
-					(void *) &thread_args[i]);
+					(void *) &thread_args[t]);
 		}
 
 		//join threads
-		for (i = 0; i < m->size; i++) {
-			pthread_join(threads[i], NULL);
+		for (t = 0; t < thread_count; t++) {
+			pthread_join(threads[t], NULL);
 		}
 
 		//calculate current error as "norma"
 		n1 = 0;
 		n2 = 0;
 		for (i = 0; i < m->size; i++) {
-			printf("%f.6, ", x[i]);
-			x2[i] = x[i] - x0[i];
+			//printf("%.6f, ", x[i]);
 			n1 += x2[i] * x2[i];
 			n2 += x[i] * x[i];
 		}
 		norma = sqrt(n1 / n2);
-		printf("\nnorma = %.6f, norma_ant = %.6f, n1 = %.6f, n2 = %.6f \n", norma, norma_ant, n1, n2);
+		//printf("\nnorma = %.6f, norma_ant = %.6f, n1 = %.6f, n2 = %.6f \n", norma, norma_ant, n1, n2);
 
 		if (k > 1 && (norma <= precision)) {
 			break;
@@ -97,9 +121,6 @@ jacobi_result* jacobi_parallel_pthread(matrix *m, int thread_count) {
 		}
 
 	}
-
-
-	printf("In main: All threads completed successfully\n");
 
 	//prepare results
 	jacobi_result* res = malloc(sizeof(jacobi_result));
@@ -114,6 +135,7 @@ jacobi_result* jacobi_parallel_pthread(matrix *m, int thread_count) {
 	free(x);
 	free(x0);
 	free(x2);
+	free(thread_args);
 
 	return res;
 }

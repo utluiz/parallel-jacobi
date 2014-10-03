@@ -31,14 +31,14 @@ jacobi_result* jacobi_serial(matrix *m) {
 				}
 			}
 			x[i] = (m->b[i] - soma) / m->a[i][i];
+			x2[i] = x[i] - x0[i];
 		}
 
 		//calculate current error as "norma"
 		n1 = 0;
 		n2 = 0;
 		for (i = 0; i < m->size; i++) {
-			//printf("%f.6, ", x[i]);
-			x2[i] = x[i] - x0[i];
+			//printf("%f, ", x[i]);
 			n1 += x2[i] * x2[i];
 			n2 += x[i] * x[i];
 		}

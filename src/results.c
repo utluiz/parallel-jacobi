@@ -5,7 +5,6 @@
 
 void write_results(timer* t, char* inputfile, int thread_count, int algorithm, int size) {
 	//clock time
-
 #ifdef __linux__ || _unix_ || _unix
     struct timespec spec;
     clock_gettime(CLOCK_REALTIME, &spec);
@@ -24,7 +23,7 @@ void write_results(timer* t, char* inputfile, int thread_count, int algorithm, i
 
 	//filename
 	char filename[80];
-	sprintf(&filename, "results-%i.txt", algorithm);
+	sprintf(&filename, "results-%i-%i.txt", algorithm, thread_count);
 
    	//write to file
    	FILE* f = fopen(filename, "a");

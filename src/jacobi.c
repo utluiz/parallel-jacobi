@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 //#include <unistd.h>
-#include <windows.h>
+//#include <windows.h>
 #include "matrix.h"
 #include "timer.h"
 #include "results.h"
@@ -35,10 +35,10 @@ int main(int argc, char *argv[]) {
 	}
 
 	//# of threads
-	int thread_count = strtol(argv[2], NULL, 4);
+	int thread_count = strtol(argv[2], NULL, 10);
 
 	//algorithm
-	int algorithm = strtol(argv[3], NULL, 0);
+	int algorithm = strtol(argv[3], NULL, 10);
 
 	//prints info
 	printf("Input file: '%s', thread count: %i, algorithm: %i\n\n", argv[1], thread_count, algorithm);
@@ -66,7 +66,8 @@ int main(int argc, char *argv[]) {
 		default:
 			result = jacobi_serial(m);
 	}
-	Sleep(500);
+	//Sleep(500);
+
 	//stops timer
 	stop_timer_print(t);
 
