@@ -12,7 +12,7 @@ typedef struct jacobi_result_t {
 } jacobi_result;
 
 jacobi_result* jacobi_serial(matrix *m);
-
 jacobi_result* jacobi_parallel_pthread(matrix *m, int thread_count);
+jacobi_result* jacobi_parallel_pthread_better(matrix *m, int thread_count);
 
 #endif /* JACOBI_SERIAL_H_ */

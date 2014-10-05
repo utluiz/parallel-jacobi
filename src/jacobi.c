@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 
 	switch (algorithm) {
 		case 1: // pthread parallel
-			result = jacobi_parallel_pthread(m, thread_count);
+			result = jacobi_parallel_pthread_better(m, thread_count);
 			break;
 		case 2: // MPI parallel
 			break;
