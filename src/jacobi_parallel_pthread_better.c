@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <pthread.h>
-//#include <windows.h>
 #include "matrix.h"
 #include "jacobi.h"
 
@@ -21,8 +20,7 @@ bool fim = false;
 int thread_finished = 0;
 int thread_count_global = 0;
 
-void *jacobi_pthread_task_better(void *argument)
-{
+void *jacobi_pthread_task_better(void *argument) {
 	thread_argument_pthread_better *thread_arg =
 			(thread_argument_pthread_better *) argument;
 
@@ -63,7 +61,7 @@ void *jacobi_pthread_task_better(void *argument)
 	return NULL;
 }
 
-jacobi_result* jacobi_parallel_pthread_better(matrix *m, int thread_count) {
+jacobi_result* jacobi_parallel_pthread_better(matrix *m, int thread_count, bool verbose) {
 
 	pthread_t *threads = malloc(m->size * sizeof(pthread_t));
 	thread_argument_pthread_better *thread_args =
@@ -145,9 +143,11 @@ jacobi_result* jacobi_parallel_pthread_better(matrix *m, int thread_count) {
 			n2 += x[i] * x[i];
 		}
 		norma = sqrt(n1 / n2);
+
+		if (verbose) printf("\nk = %i, norma = %.20f, norma_ant = %.6f, n1 = %.6f, n2 = %.6f \n", k, norma, norma_ant, n1, n2);
 		//printf("\nnorma = %.6f, norma_ant = %.6f, n1 = %.6f, n2 = %.6f \n", norma, norma_ant, n1, n2);
 
-		if (k > 1 && (norma <= precision)) {
+		if ((k > 1 && (norma <= precision)) || isnan(norma)) {
 			break;
 		} else {
 			norma_ant = norma;
@@ -180,7 +180,7 @@ jacobi_result* jacobi_parallel_pthread_better(matrix *m, int thread_count) {
 	for (i = 0; i < m->size; i++) {
 		res->x[i] = x[i];
 	}
-	res->e = norma - norma_ant;
+	res->e = norma;
 	res->k = k;
 
 	//free memory
