@@ -3,7 +3,7 @@
 #include <math.h>
 #include "results.h"
 
-void write_results(timer* t, char* inputfile, int thread_count, int algorithm, int size) {
+void write_results(timer* t, char* inputfile, int thread_count, char algorithm, int size) {
 	//clock time
 	#ifdef __linux__ // || _unix_ || _unix
 		struct timespec spec;
@@ -22,7 +22,11 @@ void write_results(timer* t, char* inputfile, int thread_count, int algorithm, i
 
 	//filename
 	char filename[80];
-	sprintf((char*) &filename, "results/%i-%i.txt", algorithm, thread_count);
+	if (algorithm == 'S') {
+		sprintf((char*) &filename, "results/%c.txt", algorithm);
+	} else {
+		sprintf((char*) &filename, "results/%c%i.txt", algorithm, thread_count);
+	}
 
    	//write to file
    	FILE* f = fopen(filename, "a");

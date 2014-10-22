@@ -29,13 +29,21 @@ jacobi_result* jacobi_parallel_omp(matrix *m, int thread_count, bool verbose) {
 	{
 		double soma, x2;
 		int i, j;
+
+		int thread_num = omp_get_thread_num();
+		if (verbose) {
+			printf("THREAD COUNT = %i, EXPECTED = %i, CURRENT=%i\n\n",
+					omp_get_num_threads(), thread_count, thread_num);
+		}
+
 		while (termina == 0 && k < 100) {
 
 			//sum up items for each row
 			//#pragma omp for reduction(+:n1, n2) private (j, soma, x2) //nowait
 			//# dynamic, static, guided, runtime
-			#pragma omp for reduction(+:n1, n2) private (j, soma, x2) schedule(runtime)
+			#pragma omp for reduction(+:n1, n2) private (j, soma, x2) schedule(static, 2)
 			for (i = 0; i < m->size; i++) {
+				if (verbose && i < 100) printf("Thread %i processing line %i\n", thread_num, i);
 				soma = 0;
 				for (j = 0; j < m->size; j++) {
 					if (j != i) {
