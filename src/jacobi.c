@@ -88,13 +88,13 @@ int main(int argc, char *argv[]) {
 	write_results(t, argv[1], thread_count, algorithm, m->size);
 
 	//frees matrix
-	matrix_destroy(m);
+	//matrix_destroy(m);
 
 	//frees timer
-	free(t);
+//	free(t);
 
 	//frees result
-	free(result);
+//	free(result);
 
 	if (verbose) puts("\n\n---END---");
 	return EXIT_SUCCESS;
