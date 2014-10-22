@@ -25,7 +25,7 @@ jacobi_result* jacobi_parallel_omp(matrix *m, int thread_count, bool verbose) {
 
 	//main loop
 	#pragma omp parallel num_threads(thread_count) \
-		shared(norma, norma_ant, k, termina, n1, n2)
+		shared(norma, norma_ant, k, termina, n1, n2, m)
 	{
 		double soma, x2;
 		int i, j;

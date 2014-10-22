@@ -94,6 +94,7 @@ int main(int argc, char *argv[]) {
 	free(t);
 
 	//frees result
+	free(result->x);
 	free(result);
 
 	if (verbose) puts("\n\n---END---");
