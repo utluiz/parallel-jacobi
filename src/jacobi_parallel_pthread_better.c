@@ -172,6 +172,7 @@ jacobi_result* jacobi_parallel_pthread_better(matrix *m, int thread_count, bool 
 
 	for (t = 0; t < thread_count; t++) {
 		pthread_join(threads[t], NULL);
+		pthread_detach(threads[t]);
 	}
 
 	//prepare results
@@ -187,6 +188,7 @@ jacobi_result* jacobi_parallel_pthread_better(matrix *m, int thread_count, bool 
 	free(x);
 	free(x0);
 	free(x2);
+	free(threads);
 	free(thread_args);
 
 	return res;

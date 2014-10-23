@@ -49,7 +49,7 @@ matrix* matrix_load_mm(char* filename) {
 
 	//allocates "cols"
 	for (i = 0; i < size; i++) {
-		m->a[i] = malloc(size*sizeof(double));
+		m->a[i] = malloc(size * sizeof(double));
 		for (j = 0; j < size; j++) {
 			m->a[i][j] = 0;
 		}
@@ -153,7 +153,7 @@ matrix* matrix_load_original(char* filename) {
 
 	//allocates "cols"
 	for (i = 0;i < size; i++) {
-		m->a[i] = malloc(size*sizeof(double));
+		m->a[i] = malloc(size * sizeof(double));
 	}
 
 	char c[10];
@@ -203,13 +203,13 @@ void matrix_destroy(matrix* matrix) {
 	#ifndef __linux__
 		return;
 	#endif
-	int i;
-	free(matrix->a);
-	free(matrix->b);
-	free(matrix->x);
-	for (i = 0; i < matrix->size; i++) {
-		free(matrix->a[i]);
-	}
+	//int i;
+	//for (i = 0; i < matrix->size; i++) {
+		//free(matrix->a[i]);
+	//}
+	//free(matrix->a);
+	//free(matrix->b);
+	//free(matrix->x);
 	free(matrix);
 }
 

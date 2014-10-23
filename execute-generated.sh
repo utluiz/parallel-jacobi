@@ -1,7 +1,7 @@
 #!/bin/sh
 
-num_threads=$1
-algorithm=$2
+algorithm=$1
+num_threads=$2
 verbose=0
 
 #base_path=/c/Users/losa/git/parallel-jacobi/results
@@ -17,6 +17,6 @@ for i in `seq 2 2 128`; do
 	#else
 	#    echo NONE
 	#fi
-    ./Debug/parallel-jacobi $filename $num_threads $algorithm $verbose
+    ./Debug/parallel-jacobi $filename $algorithm $num_threads $verbose
 done
 

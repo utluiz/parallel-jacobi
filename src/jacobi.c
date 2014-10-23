@@ -8,20 +8,21 @@
 /*
  * Accept as parameter:
  *  - input file
- *  - # of threads
  *  - algorithm
- *    - 0: serial
- *    - 1: pthread parallel
- *    - 2: OpenMP parallel
- *    - 3: MPI parallel
+ *    - S: serial
+ *    - P: Pthread parallel
+ *    - O: OpenMP parallel
+ *    - M: MPI parallel
+ *  - verbose (show data in console)
+ *  - # of threads
  *
- * 1. Read matrix from file
- * 2. Solve linear system through jacobi method
- * 3. Write output
+ * Main steps
+ *  1. Read matrix from file
+ *  2. Solve linear system through Jacobi Method
+ *  3. Write output
  *
  * Output
- * 	Result: success or failure
- * 	Elapsed time
+ * 	Result file with statistics
  */
 
 int main(int argc, char *argv[]) {
@@ -31,10 +32,10 @@ int main(int argc, char *argv[]) {
 		exit(1);
 	}
 
-	//# of threads
-	int thread_count = strtol(argv[2], NULL, 10);
 	//algorithm
-	int algorithm = strtol(argv[3], NULL, 10);
+	char algorithm = argv[2][0];
+	//# of threads
+	int thread_count = strtol(argv[3], NULL, 10);
 	//console output level
 	int verbose = strtol(argv[4], NULL, 10);
 
@@ -42,7 +43,7 @@ int main(int argc, char *argv[]) {
 
 	//prints info
 	if (verbose)
-		printf("Input file: '%s', thread count: %i, algorithm: %i\n\n", argv[1], thread_count, algorithm);
+		printf("Input file: '%s', thread count: %i, algorithm: %c\n\n", argv[1], thread_count, algorithm);
 
 	//loads matrix
 	matrix *m = matrix_load(argv[1]);
@@ -57,15 +58,15 @@ int main(int argc, char *argv[]) {
 	jacobi_result* result;
 
 	switch (algorithm) {
-		case 1: // pthread parallel
+		case 'P': // pthread parallel
 			result = jacobi_parallel_pthread_better(m, thread_count, verbose);
 			break;
-		case 2: // OpenMP parallel
+		case 'O': // OpenMP parallel
 			result = jacobi_parallel_omp(m, thread_count, verbose);
 			break;
-		case 3: // MPI parallel
+		case 'M': // MPI parallel
 			break;
-		case 0: // serial
+		case 'S': // serial
 		default:
 			result = jacobi_serial(m, verbose);
 	}
@@ -88,13 +89,14 @@ int main(int argc, char *argv[]) {
 	write_results(t, argv[1], thread_count, algorithm, m->size);
 
 	//frees matrix
-	//matrix_destroy(m);
+	matrix_destroy(m);
 
 	//frees timer
-//	free(t);
+	free(t);
 
 	//frees result
-//	free(result);
+	//free(result->x);
+	free(result);
 
 	if (verbose) puts("\n\n---END---");
 	return EXIT_SUCCESS;
