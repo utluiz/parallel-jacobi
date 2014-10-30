@@ -41,7 +41,7 @@ jacobi_result* jacobi_parallel_omp(matrix *m, int thread_count, bool verbose) {
 			//sum up items for each row
 			//#pragma omp for reduction(+:n1, n2) private (j, soma, x2) //nowait
 			//# dynamic, static, guided, runtime
-			#pragma omp for reduction(+:n1, n2) private (j, soma, x2) schedule(runtime)
+			#pragma omp for reduction(+:n1, n2) private (j, soma, x2) schedule(static, 2)
 			for (i = 0; i < m->size; i++) {
 				//if (verbose && i < 100) printf("Thread %i processing line %i\n", thread_num, i);
 				soma = 0;
