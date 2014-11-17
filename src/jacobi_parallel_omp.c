@@ -50,6 +50,7 @@ jacobi_result* jacobi_parallel_omp(matrix *m, int thread_count, bool verbose) {
 						soma += m->a[i][j] * x0[j];
 					}
 				}
+				//printf("linha = %i, soma = %f\n", i, soma);
 				x[i] = (m->b[i] - soma) / m->a[i][i];
 				x2 = x[i] - x0[i];
 
@@ -82,6 +83,14 @@ jacobi_result* jacobi_parallel_omp(matrix *m, int thread_count, bool verbose) {
 					memcpy(x0, x, line_size);
 					k++;
 				}
+
+				/*
+				printf("\nx0 = ");
+				for (i = 0; i < m->size; i++) {
+					printf("%f, ", x0[i]);
+				}
+				printf("\n");
+				*/
 
 			}
 

@@ -12,19 +12,17 @@
  *    - S: serial
  *    - P: Pthread parallel
  *    - O: OpenMP parallel
- *    - M: MPI parallel
  *  - verbose (show data in console)
  *  - # of threads
  *
  * Main steps
  *  1. Read matrix from file
- *  2. Solve linear system through Jacobi Method
+ *  2. Solve linear system using Jacobi Method
  *  3. Write output
  *
  * Output
  * 	Result file with statistics
  */
-
 int main(int argc, char *argv[]) {
 
 	if ( argc != 5 ) {
@@ -64,8 +62,10 @@ int main(int argc, char *argv[]) {
 		case 'O': // OpenMP parallel
 			result = jacobi_parallel_omp(m, thread_count, verbose);
 			break;
+		/*
 		case 'M': // MPI parallel
 			break;
+		*/
 		case 'S': // serial
 		default:
 			result = jacobi_serial(m, verbose);
