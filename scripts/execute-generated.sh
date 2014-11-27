@@ -8,8 +8,8 @@ cd ..
 execute(){
 	for i in `seq 2 2 128`; do
 		filename=./generated/m$i-1.txt
-		for j in `seq 1 5`; do
-			echo $i, $j
+		for j in `seq 1 20`; do
+#			echo $i, $j
 			./Release/parallel-jacobi $filename $1 $2 0
 		done
 	done

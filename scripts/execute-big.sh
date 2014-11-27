@@ -3,10 +3,10 @@
 cd ..
 
 execute(){
-	for i in `seq 1 5`; do
-#		./Release/parallel-jacobi "./big/c-33/c-33.mtx" $1 $2 0
+	for i in `seq 1 20`; do
+		./Release/parallel-jacobi "/home/luiz/git/distributed-jacobi/big/c-33.mtx" $1 $2 0
 		./Release/parallel-jacobi "/home/luiz/git/distributed-jacobi/big/3D_51448_3D.mtx" $1 $2 0
-#		./Release/parallel-jacobi "/home/luiz/git/distributed-jacobi/big/OPF_3754.mtx" $1 $2 0
+		./Release/parallel-jacobi "/home/luiz/git/distributed-jacobi/big/powersim.mtx" $1 $2 0
 	done
 }
 
