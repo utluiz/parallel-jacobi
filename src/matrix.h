@@ -1,8 +1,13 @@
 #ifndef MATRIX_H_
 #define MATRIX_H_
 
+typedef struct item_matrix_t {
+	double value;
+	int column;
+} item_matrix;
+
 typedef struct matrix_t {
-	double** a;
+	item_matrix **a;
 	double *b, *x;
 	unsigned int size;
 } matrix;

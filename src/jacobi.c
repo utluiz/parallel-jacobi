@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 	if (verbose) {
 		int i;
 		printf("\nResults: ");
-		for (i = 0; i < m->size; i++) {
+		for (i = 0; i < m->size && i < 200; i++) {
 			printf("%f, ", result->x[i]);
 		}
 		printf("\nIterations: %i ", result->k);

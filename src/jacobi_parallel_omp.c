@@ -45,18 +45,26 @@ jacobi_result* jacobi_parallel_omp(matrix *m, int thread_count, bool verbose) {
 			for (i = 0; i < m->size; i++) {
 				//if (verbose && i < 100) printf("Thread %i processing line %i\n", thread_num, i);
 				soma = 0;
-				for (j = 0; j < m->size; j++) {
-					if (j != i) {
-						soma += m->a[i][j] * x0[j];
+				item_matrix *item = m->a[i];
+				if (item) {
+					double diagonal_value = 0;
+					while (item->column >= 0) {
+						j = item->column;
+						if (j != i) {
+							soma += item->value * x0[j];
+						} else {
+							diagonal_value = item->value;
+						}
+						item++;
 					}
-				}
-				//printf("linha = %i, soma = %f\n", i, soma);
-				x[i] = (m->b[i] - soma) / m->a[i][i];
-				x2 = x[i] - x0[i];
+					//printf("linha = %i, soma = %f\n", i, soma);
+					x[i] = (m->b[i] - soma) / diagonal_value;
+					x2 = x[i] - x0[i];
 
-				//reduction for norma
-				n1 += x2 * x2;
-				n2 += x[i] * x[i];
+					//reduction for norma
+					n1 += x2 * x2;
+					n2 += x[i] * x[i];
+				}
 			}
 
 			//synchronize all threads (already has an implicit barrier after for)

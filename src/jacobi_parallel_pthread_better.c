@@ -35,14 +35,25 @@ void *jacobi_pthread_task_better(void *argument) {
 		//printf("Hello from thread %i\n", thread_arg->number);
 		for (i = thread_arg->initial_line; i <= thread_arg->end_line; i++) {
 			soma = 0;
-			for (j = 0; j < m->size; j++) {
-				if (j != i) {
-					soma += m->a[i][j] * x0[j];
+			item_matrix *item = m->a[i];
+			if (item) {
+				double diagonal_value = 0;
+				while (item->column >= 0) {
+					j = item->column;
+					if (j != i) {
+						soma += item->value * x0[j];
+					} else {
+						diagonal_value = item->value;
+					}
+					item++;
 				}
-				//Sleep(100);
+				x[i] = (m->b[i] - soma) / diagonal_value;
+				x2[i] = x[i] - x0[i];
+			} else {
+				x[i] = 0;
+				x2[i] = 0;
 			}
-			x[i] = (m->b[i] - soma) / m->a[i][i];
-			x2[i] = x[i] - x0[i];
+
 		}
 
 		//wait until another task or finish

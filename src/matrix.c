@@ -13,7 +13,7 @@
  */
 matrix* matrix_load_mm(char* filename) {
 
-	long i, j, size, size_cols, count, row, col;
+	long i, size, size_cols, count, row, col;
 
 	//open file
 	FILE *file;
@@ -38,33 +38,43 @@ matrix* matrix_load_mm(char* filename) {
 	matrix *m = malloc(sizeof(matrix));
 	m->size = size;
 
-	//allocates "rows"
-	m->a = malloc(size * sizeof(double*));
-
 	//allocates vector right "B"
 	m->b = malloc(size * sizeof(double));
 
 	//allocates vector with expected results
 	m->x = malloc(size * sizeof(double));
 
-	//allocates "cols"
-	for (i = 0; i < size; i++) {
-		m->a[i] = malloc(size * sizeof(double));
-		for (j = 0; j < size; j++) {
-			m->a[i][j] = 0;
-		}
+	//allocates "rows"
+	m->a = malloc(size * sizeof(item_matrix*));
+	for (i = 1;i < size; i++) {
+		m->a[i] = NULL;
 	}
 
+	//allocates matrix contents
+	m->a[0] = malloc((count + size) * sizeof(item_matrix));
+
 	//read matrix A
+	item_matrix *position = m->a[0];
+	int last_row = 1;
 	for (i = 0; i < count; i++) {
 		fscanf(file, "%li", &row);
 		fscanf(file, "%li", &col);
-		if (!fscanf(file, "%lf", &m->a[row - 1][col - 1])) {
+		if (row != last_row) {
+			position->column = -1;
+			position++;
+		}
+		position->column = col - 1;
+		if (!fscanf(file, "%lf", &position->value)) {
 			break;
 		}
-	}
+		if (row != last_row) {
+			m->a[row - 1] = position;
+			last_row = row;
+		}
+		position++;
 
-	fclose(file);
+	}
+	position->column = -1;
 
 	//read vector B
 	char filename_b[100];
@@ -79,7 +89,7 @@ matrix* matrix_load_mm(char* filename) {
 	}
 
 	//ignores
-	fscanf(file, "%li", &size_cols);
+	fscanf(file, "%li", &count);
 	fscanf(file, "%li", &size_cols);
 
 	for (i = 0; i < count; i++) {
@@ -106,10 +116,10 @@ matrix* matrix_load_mm(char* filename) {
 		}
 
 		//ignores
-		fscanf(file, "%li", &size_cols);
+		fscanf(file, "%li", &count);
 		fscanf(file, "%li", &size_cols);
 
-		for(i = 0; i < count; i++) {
+		for (i = 0; i < count; i++) {
 			if (!fscanf(file, "%lf", &m->x[i])) {
 				break;
 			}
@@ -117,7 +127,7 @@ matrix* matrix_load_mm(char* filename) {
 
 		fclose(file);
 	} else {
-		for(i = 0; i < count; i++) {
+		for (i = 0; i < size; i++) {
 			m->x[i] = -1.0;
 		}
 	}
@@ -142,30 +152,35 @@ matrix* matrix_load_original(char* filename) {
 	//read matrix size
 	fscanf(file, "%iu", &size);
 
-	//allocates "rows"
-	m->a = malloc(size * sizeof(double*));
-
 	//allocates vector right "B"
 	m->b = malloc(size * sizeof(double));
 
 	//allocates vector with expected results
 	m->x = malloc(size * sizeof(double));
 
-	//allocates "cols"
-	for (i = 0;i < size; i++) {
-		m->a[i] = malloc(size * sizeof(double));
-	}
+	//allocates "rows"
+	m->a = malloc(size * sizeof(item_matrix*));
+
+	//allocates matrix contents
+	m->a[0] = malloc((size*size + size) * sizeof(item_matrix));
 
 	char c[10];
 
 	//read rows
-	for(i = 0; i < size; i++) {
+	item_matrix *position = m->a[0];
+	for (i = 0; i < size; i++) {
+		m->a[i] = position;
 		//read cols
-		for(j = 0; j < size; j++) {
-			if (!fscanf(file, "%lf", &m->a[i][j])) {
+		for (j = 0; j < size; j++) {
+			position->column = j;
+			if (!fscanf(file, "%lf", &position->value)) {
 				break;
 			}
+			position++;
 		}
+		position->column = -1;
+		position++;
+
 		fscanf(file, "%s", (char*) &c);
 
 		if (!fscanf(file, "%lf", &m->b[i])) {
@@ -174,7 +189,7 @@ matrix* matrix_load_original(char* filename) {
 	}
 
 	//read expected results
-	for(i = 0; i < size; i++) {
+	for (i = 0; i < size; i++) {
 		if (!fscanf(file, "%lf", &m->x[i])) {
 			break;
 		}
@@ -214,16 +229,20 @@ void matrix_destroy(matrix* matrix) {
 }
 
 void matrix_print(matrix *m) {
-	int i, j, s;
-	s = m->size;
+	int i, j = 0, s = m->size;
+	puts("aqui");
 	for (i = 0; i < s && i < 200; i++) {
-		for (j = 0; j < s && j < 200; j++) {
-			printf("%f ", m->a[i][j]);
+		item_matrix *item = m->a[i];
+		if (item) {
+			while (item->column >= 0 && j < 200) {
+				j = item->column;
+				printf("(%i,%i)=%f ", i, j, item->value);
+				item++;
+			}
 		}
 		printf("= %f\n", m->b[i]);
 	}
-	puts("\nExpected result: ");
-	for (i = 0; i < s; i++) {
+	for (i = 0; i < s && i < 200; i++) {
 		if (i > 0) printf(", ");
 		printf("%f", m->x[i]);
 	}

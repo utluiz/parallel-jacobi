@@ -12,7 +12,8 @@ jacobi_result* jacobi_serial(matrix *m, bool verbose) {
 	//initialize temp arrays
 	double *x = malloc(m->size * sizeof(double));
 	double *x0 = malloc(m->size * sizeof(double));
-	double *x2 = malloc(m->size * sizeof(double));
+	//double *x2 = malloc(m->size * sizeof(double));
+	double x2;
 
 	//initial position
 	for (i = 0; i < m->size; i++) {
@@ -22,26 +23,36 @@ jacobi_result* jacobi_serial(matrix *m, bool verbose) {
 	//main loop
 	while (k < 100) {
 
-		//sum up items
-		for (i = 0; i < m->size; i++) {
-			soma = 0;
-			for (j = 0; j < m->size; j++) {
-				if (j != i) {
-					soma += m->a[i][j] * x0[j];
-				}
-			}
-			x[i] = (m->b[i] - soma) / m->a[i][i];
-			x2[i] = x[i] - x0[i];
-		}
-
-		//calculate current error as "norma"
 		n1 = 0;
 		n2 = 0;
 		for (i = 0; i < m->size; i++) {
-			//printf("%f, ", x[i]);
-			n1 += x2[i] * x2[i];
-			n2 += x[i] * x[i];
+			//sum up line items
+			soma = 0;
+			item_matrix *item = m->a[i];
+			if (item) {
+				double diagonal_value = 0;
+				while (item->column >= 0) {
+					j = item->column;
+					if (j >= m->size) {
+						puts("opa");
+						exit(0);
+					}
+					if (j != i) {
+						soma += item->value * x0[j];
+					} else {
+						diagonal_value = item->value;
+					}
+					item++;
+				}
+				x[i] = (m->b[i] - soma) / diagonal_value;
+				x2 = x[i] - x0[i];
+
+				n1 += x2 * x2;
+				n2 += x[i] * x[i];
+			}
 		}
+
+		//calculate current error as "norma"
 		norma = sqrt(n1 / n2);
 		if (verbose) printf("\nk = %i, norma = %.20f, norma_ant = %.6f, n1 = %.6f, n2 = %.6f \n", k, norma, norma_ant, n1, n2);
 
@@ -69,7 +80,7 @@ jacobi_result* jacobi_serial(matrix *m, bool verbose) {
 	//free memory
 	free(x);
 	free(x0);
-	free(x2);
+	//free(x2);
 
 	return res;
 }
